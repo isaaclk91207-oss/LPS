@@ -5,7 +5,7 @@ import qrcode
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from fastapi.security import HTTPBearer
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
@@ -27,7 +27,7 @@ from seed import seed_database
 Base.metadata.create_all(bind=engine)
 seed_database()
 
-app = FastAPI(title="uab Cafe Loyalty API", security=[{"HTTPBearer": []}])
+app = FastAPI(title="uab Cafe Loyalty API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -129,6 +129,16 @@ def login_customer(data: UserLogin, db: Session = Depends(get_db)):
 def login_barista(data: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == data.username, User.role == "barista").first()
     if not user or not verify_password(data.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+    token = create_access_token({"sub": user.id})
+    return TokenResponse(access_token=token, role=user.role, name=user.name)
+
+
+@app.post("/api/auth/swagger-login", response_model=TokenResponse, include_in_schema=False)
+def login_swagger(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     token = create_access_token({"sub": user.id})

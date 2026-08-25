@@ -11,13 +11,12 @@ export default function QRScanner() {
   const scannerRef = useRef(null);
   const navigate = useNavigate();
 
-  const isDynamicToken = (text) => text.trim().startsWith("UAB");
+  const isDynamicToken = (text) => text.trim().startsWith("uab");
   const isValidManualCode = (text) => /^CUS-\d{3}$/i.test(text.trim());
 
   const handleDecodedText = async (decodedText) => {
     const code = decodedText.trim();
 
-    // Dynamic QR token (UAB...)
     if (isDynamicToken(code)) {
       setScannedCode("Verifying...");
       try {
@@ -34,7 +33,6 @@ export default function QRScanner() {
       return;
     }
 
-    // Static manual code (CUS-XXX)
     if (isValidManualCode(code.toUpperCase())) {
       setScannedCode(code.toUpperCase());
       stopScanner();
@@ -42,7 +40,7 @@ export default function QRScanner() {
       return;
     }
 
-    setError("Invalid QR code. Please scan a UAB Cafe QR or enter code manually.");
+    setError("Invalid QR code. Please scan a uab Cafe QR or enter code manually.");
   };
 
   const startScanner = async () => {
@@ -56,11 +54,7 @@ export default function QRScanner() {
 
       await scanner.start(
         { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 220, height: 220 },
-          aspectRatio: 1.0,
-        },
+        { fps: 10, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 },
         (decodedText) => handleDecodedText(decodedText),
         () => {}
       );
@@ -109,12 +103,8 @@ export default function QRScanner() {
       </div>
 
       {error && <div style={styles.error}>{error}</div>}
+      {scannedCode && <div style={styles.successBanner}>{scannedCode}</div>}
 
-      {scannedCode && (
-        <div style={styles.successBanner}>{scannedCode}</div>
-      )}
-
-      {/* Camera Scanner */}
       <div style={styles.card}>
         <div style={styles.scannerContainer}>
           <div id="qr-reader" style={styles.qrReader} />
@@ -137,7 +127,6 @@ export default function QRScanner() {
         )}
       </div>
 
-      {/* Manual Entry */}
       <div style={styles.card}>
         <div style={styles.divider}>
           <span style={styles.dividerLine} />
@@ -162,7 +151,7 @@ export default function QRScanner() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#f0f2f5",
+    background: "var(--cream)",
     padding: "1rem",
     maxWidth: "480px",
     margin: "0 auto",
@@ -171,53 +160,53 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "1rem",
-    marginBottom: "1rem",
+    marginBottom: "1.25rem",
   },
   backBtn: {
-    padding: "0.4rem 0.8rem",
-    background: "#666",
-    color: "#fff",
+    padding: "0.5rem 1rem",
+    background: "var(--brown-light)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "6px",
+    borderRadius: "8px",
     cursor: "pointer",
   },
   title: {
     margin: 0,
-    color: "#1a5276",
-    fontSize: "1.25rem",
+    color: "var(--brown-dark)",
+    fontSize: "1.3rem",
   },
   error: {
-    background: "#ffebee",
-    color: "#c62828",
+    background: "#FFEBEE",
+    color: "var(--error)",
     padding: "0.75rem",
-    borderRadius: "8px",
+    borderRadius: "10px",
     marginBottom: "1rem",
     textAlign: "center",
     fontSize: "0.9rem",
   },
   successBanner: {
-    background: "#e8f5e9",
-    color: "#2d6a4f",
+    background: "var(--gold)",
+    color: "var(--brown-dark)",
     padding: "0.75rem",
-    borderRadius: "8px",
+    borderRadius: "10px",
     marginBottom: "1rem",
     textAlign: "center",
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   card: {
-    background: "#fff",
+    background: "var(--cream-light)",
     padding: "1.25rem",
-    borderRadius: "12px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    borderRadius: "14px",
+    boxShadow: "0 4px 16px rgba(62, 39, 35, 0.08)",
     marginBottom: "1rem",
   },
   scannerContainer: {
     position: "relative",
     width: "100%",
     marginBottom: "1rem",
-    borderRadius: "8px",
+    borderRadius: "10px",
     overflow: "hidden",
-    background: "#000",
+    background: "#1a1a1a",
   },
   qrReader: {
     width: "100%",
@@ -239,46 +228,10 @@ const styles = {
     height: "220px",
     position: "relative",
   },
-  cornerTL: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "30px",
-    height: "30px",
-    borderTop: "3px solid #2d6a4f",
-    borderLeft: "3px solid #2d6a4f",
-    borderRadius: "4px 0 0 0",
-  },
-  cornerTR: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: "30px",
-    height: "30px",
-    borderTop: "3px solid #2d6a4f",
-    borderRight: "3px solid #2d6a4f",
-    borderRadius: "0 4px 0 0",
-  },
-  cornerBL: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    width: "30px",
-    height: "30px",
-    borderBottom: "3px solid #2d6a4f",
-    borderLeft: "3px solid #2d6a4f",
-    borderRadius: "0 0 0 4px",
-  },
-  cornerBR: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: "30px",
-    height: "30px",
-    borderBottom: "3px solid #2d6a4f",
-    borderRight: "3px solid #2d6a4f",
-    borderRadius: "0 0 4px 0",
-  },
+  cornerTL: { position: "absolute", top: 0, left: 0, width: "30px", height: "30px", borderTop: "3px solid var(--gold)", borderLeft: "3px solid var(--gold)", borderRadius: "4px 0 0 0" },
+  cornerTR: { position: "absolute", top: 0, right: 0, width: "30px", height: "30px", borderTop: "3px solid var(--gold)", borderRight: "3px solid var(--gold)", borderRadius: "0 4px 0 0" },
+  cornerBL: { position: "absolute", bottom: 0, left: 0, width: "30px", height: "30px", borderBottom: "3px solid var(--gold)", borderLeft: "3px solid var(--gold)", borderRadius: "0 0 0 4px" },
+  cornerBR: { position: "absolute", bottom: 0, right: 0, width: "30px", height: "30px", borderBottom: "3px solid var(--gold)", borderRight: "3px solid var(--gold)", borderRadius: "0 0 4px 0" },
   scanHint: {
     color: "#fff",
     fontSize: "0.8rem",
@@ -287,22 +240,24 @@ const styles = {
   },
   scanBtn: {
     width: "100%",
-    padding: "0.75rem",
-    background: "#1a5276",
-    color: "#fff",
+    padding: "0.85rem",
+    background: "var(--brown-dark)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "10px",
     fontSize: "1rem",
+    fontWeight: "600",
     cursor: "pointer",
   },
   stopBtn: {
     width: "100%",
-    padding: "0.75rem",
-    background: "#d32f2f",
-    color: "#fff",
+    padding: "0.85rem",
+    background: "var(--error)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "10px",
     fontSize: "1rem",
+    fontWeight: "600",
     cursor: "pointer",
   },
   divider: {
@@ -314,33 +269,35 @@ const styles = {
   dividerLine: {
     flex: 1,
     height: "1px",
-    background: "#e0e0e0",
+    background: "var(--brown-light)",
   },
   dividerText: {
-    color: "#999",
+    color: "var(--brown-light)",
     fontSize: "0.85rem",
     whiteSpace: "nowrap",
   },
   input: {
     width: "100%",
-    padding: "0.75rem",
-    marginBottom: "0.75rem",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
+    padding: "0.85rem",
+    marginBottom: "0.85rem",
+    border: "2px solid var(--brown-light)",
+    borderRadius: "10px",
     fontSize: "1.1rem",
     textAlign: "center",
     boxSizing: "border-box",
     letterSpacing: "0.1em",
     fontWeight: "bold",
+    background: "var(--white)",
   },
   lookupBtn: {
     width: "100%",
-    padding: "0.75rem",
-    background: "#2d6a4f",
-    color: "#fff",
+    padding: "0.85rem",
+    background: "var(--brown-dark)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "10px",
     fontSize: "1rem",
+    fontWeight: "600",
     cursor: "pointer",
   },
 };

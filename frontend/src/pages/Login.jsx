@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
+import logo from "../assets/uabcafe-logo.jpg";
+import uabOutside from "../assets/uab-outside.jpg";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -22,9 +24,13 @@ export default function Login() {
     }
   };
 
+
+  //image bg design 
   return (
-    <div style={styles.container}>
+    <div style={{ ...styles.container, backgroundImage: `url(${uabOutside})` }}>
+      <div style={styles.overlay} />
       <div style={styles.card}>
+        <img src={logo} alt="uab Cafe" style={styles.logo} />
         <h1 style={styles.title}>uab Cafe Loyalty</h1>
         <h2 style={styles.subtitle}>Customer Login</h2>
         {error && <p style={styles.error}>{error}</p>}
@@ -48,6 +54,11 @@ export default function Login() {
         <p style={styles.link}>
           Don't have an account? <Link to="/register">Register</Link>
         </p>
+        <div style={styles.divider}>
+          <span style={styles.dividerLine} />
+          <span style={styles.dividerText}>or</span>
+          <span style={styles.dividerLine} />
+        </div>
         <p style={styles.link}>
           <Link to="/barista/login">Barista Login</Link>
         </p>
@@ -62,54 +73,97 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "#f0f2f5",
+    padding: "1rem",
+    position: "relative",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  },
+  overlay: {
+    position: "absolute",
+    inset: 0,
+    background: "rgba(62, 39, 35, 0.4)",
   },
   card: {
-    background: "#fff",
+    background: "rgba(255, 248, 231, 0.95)",
     padding: "2rem",
-    borderRadius: "12px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    borderRadius: "20px",
+    boxShadow: "0 8px 32px rgba(62, 39, 35, 0.3)",
     width: "100%",
     maxWidth: "360px",
+    position: "relative",
+    zIndex: 1,
+    backdropFilter: "blur(10px)",
+  },
+  logo: {
+    width: "80px",
+    height: "80px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    display: "block",
+    margin: "0 auto 1rem",
+    border: "3px solid var(--brown-mid)",
   },
   title: {
     textAlign: "center",
     margin: 0,
-    color: "#2d6a4f",
+    color: "var(--brown-dark)",
+    fontSize: "1.5rem",
   },
   subtitle: {
     textAlign: "center",
     marginTop: "0.25rem",
-    color: "#666",
+    color: "var(--brown-light)",
     fontWeight: "normal",
+    fontSize: "0.95rem",
   },
   input: {
     width: "100%",
-    padding: "0.75rem",
-    marginBottom: "0.75rem",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
+    padding: "0.85rem 1rem",
+    marginBottom: "0.85rem",
+    border: "2px solid var(--brown-light)",
+    borderRadius: "12px",
     fontSize: "1rem",
     boxSizing: "border-box",
+    background: "var(--white)",
   },
   button: {
     width: "100%",
-    padding: "0.75rem",
-    background: "#2d6a4f",
-    color: "#fff",
+    padding: "0.85rem",
+    background: "var(--brown-dark)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "12px",
     fontSize: "1rem",
+    fontWeight: "600",
     cursor: "pointer",
+    marginTop: "0.5rem",
   },
   error: {
-    color: "#d32f2f",
+    color: "var(--error)",
     textAlign: "center",
-    marginBottom: "0.5rem",
+    marginBottom: "0.75rem",
+    fontSize: "0.9rem",
   },
   link: {
     textAlign: "center",
     marginTop: "0.75rem",
     fontSize: "0.9rem",
+    color: "var(--brown-mid)",
+  },
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    margin: "1rem 0",
+  },
+  dividerLine: {
+    flex: 1,
+    height: "1px",
+    background: "var(--brown-light)",
+  },
+  dividerText: {
+    color: "var(--brown-light)",
+    fontSize: "0.85rem",
   },
 };

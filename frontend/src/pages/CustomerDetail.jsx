@@ -66,7 +66,7 @@ export default function CustomerDetail() {
         <h1 style={styles.title}>Customer Detail</h1>
       </div>
       <div style={styles.card}>
-        <p style={{ textAlign: "center", color: "#c62828" }}>{error}</p>
+        <p style={{ textAlign: "center", color: "var(--error)" }}>{error}</p>
         <button style={styles.addPointBtn} onClick={loadCustomer}>Retry</button>
       </div>
     </div>
@@ -92,13 +92,12 @@ export default function CustomerDetail() {
         <h1 style={styles.title}>Customer Detail</h1>
       </div>
 
-      <div style={styles.card}>
+      <div style={styles.infoCard}>
         <h2 style={styles.name}>{customer.name}</h2>
         <p style={styles.code}>{customer.customer_code}</p>
         <p style={styles.points}>Available Points: <strong>{customer.total_points}</strong></p>
       </div>
 
-      {/* Coffee Reward */}
       <div style={styles.card}>
         <div style={styles.cardHeader}>
           <h3 style={styles.cardTitle}>Coffee Reward</h3>
@@ -112,7 +111,6 @@ export default function CustomerDetail() {
         )}
       </div>
 
-      {/* Tumbler Reward */}
       <div style={styles.card}>
         <div style={styles.cardHeader}>
           <h3 style={styles.cardTitle}>Tumbler Reward</h3>
@@ -126,7 +124,6 @@ export default function CustomerDetail() {
         )}
       </div>
 
-      {/* Add Point */}
       <div style={styles.card}>
         <h3 style={styles.cardTitle}>Coffee Purchase</h3>
         <button style={styles.addPointBtn} onClick={addPoint}>+1 Point</button>
@@ -138,7 +135,7 @@ export default function CustomerDetail() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#f0f2f5",
+    background: "var(--cream)",
     padding: "1rem",
     maxWidth: "480px",
     margin: "0 auto",
@@ -147,97 +144,111 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "1rem",
-    marginBottom: "1rem",
+    marginBottom: "1.25rem",
   },
   backBtn: {
-    padding: "0.4rem 0.8rem",
-    background: "#666",
-    color: "#fff",
+    padding: "0.5rem 1rem",
+    background: "var(--brown-light)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "6px",
+    borderRadius: "8px",
     cursor: "pointer",
   },
   title: {
     margin: 0,
-    color: "#1a5276",
+    color: "var(--brown-dark)",
+    fontSize: "1.3rem",
+  },
+  infoCard: {
+    background: "var(--brown-dark)",
+    padding: "1.25rem 1.5rem",
+    borderRadius: "14px",
+    marginBottom: "1rem",
+    color: "var(--cream)",
+  },
+  name: {
+    margin: 0,
     fontSize: "1.25rem",
+    fontWeight: "600",
+  },
+  code: {
+    margin: "0.25rem 0 0.75rem",
+    color: "var(--brown-light)",
+    fontSize: "0.85rem",
+    letterSpacing: "0.1em",
+  },
+  points: {
+    margin: 0,
+    fontSize: "1rem",
   },
   card: {
-    background: "#fff",
+    background: "var(--cream-light)",
     padding: "1.25rem",
-    borderRadius: "12px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    borderRadius: "14px",
+    boxShadow: "0 4px 16px rgba(62, 39, 35, 0.08)",
     marginBottom: "1rem",
   },
   cardHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "0.5rem",
-  },
-  name: {
-    margin: 0,
-    color: "#333",
-  },
-  code: {
-    margin: "0.25rem 0 0.5rem",
-    color: "#666",
-  },
-  points: {
-    margin: 0,
-    fontSize: "1.1rem",
+    marginBottom: "0.75rem",
   },
   cardTitle: {
     margin: 0,
-    color: "#1a5276",
+    color: "var(--brown-dark)",
     fontSize: "1rem",
   },
   badge: {
-    background: "#e8f5e9",
-    color: "#2d6a4f",
+    background: "var(--gold)",
+    color: "var(--brown-dark)",
     padding: "0.2rem 0.6rem",
     borderRadius: "12px",
     fontSize: "0.85rem",
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   progressBarBg: {
     width: "100%",
-    height: "12px",
-    background: "#e0e0e0",
-    borderRadius: "6px",
+    height: "10px",
+    background: "rgba(141, 110, 99, 0.3)",
+    borderRadius: "5px",
     overflow: "hidden",
     marginBottom: "0.75rem",
   },
   progressBarFill: {
     height: "100%",
-    background: "#1a5276",
-    borderRadius: "6px",
+    background: "var(--brown-mid)",
+    borderRadius: "5px",
     transition: "width 0.3s",
   },
   redeemBtn: {
     width: "100%",
-    padding: "0.6rem",
-    background: "#2d6a4f",
-    color: "#fff",
+    padding: "0.7rem",
+    background: "var(--brown-dark)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "10px",
     fontSize: "0.95rem",
+    fontWeight: "600",
     cursor: "pointer",
   },
   addPointBtn: {
     width: "100%",
-    padding: "0.75rem",
-    background: "#1a5276",
-    color: "#fff",
+    padding: "0.85rem",
+    background: "var(--brown-dark)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "10px",
     fontSize: "1.1rem",
+    fontWeight: "600",
     cursor: "pointer",
+    marginTop: "0.5rem",
   },
   loading: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     minHeight: "100vh",
+    color: "var(--brown-dark)",
   },
 };

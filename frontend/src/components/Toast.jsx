@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 let toastId = 0;
 
@@ -52,20 +52,20 @@ const styles = {
     maxWidth: "400px",
   },
   toast: {
-    padding: "0.75rem 1rem",
-    borderRadius: "8px",
-    color: "#fff",
+    padding: "0.85rem 1rem",
+    borderRadius: "10px",
+    color: "var(--cream)",
     fontSize: "0.95rem",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    boxShadow: "0 4px 16px rgba(62, 39, 35, 0.2)",
     textAlign: "center",
   },
   success: {
-    background: "#2d6a4f",
+    background: "var(--brown-dark)",
   },
   error: {
-    background: "#c62828",
+    background: "var(--error)",
   },
   info: {
-    background: "#1a5276",
+    background: "var(--brown-mid)",
   },
 };

@@ -28,7 +28,7 @@ export default function CustomerSearch() {
         <h1 style={styles.title}>Find Customer</h1>
       </div>
 
-      <div style={styles.card}>
+      <div style={styles.searchCard}>
         <input
           style={styles.searchInput}
           type="text"
@@ -39,7 +39,7 @@ export default function CustomerSearch() {
         />
       </div>
 
-      <div style={styles.card}>
+      <div style={styles.resultsCard}>
         {loading ? (
           <p style={styles.empty}>Searching...</p>
         ) : results.length === 0 ? (
@@ -71,7 +71,7 @@ export default function CustomerSearch() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#f0f2f5",
+    background: "var(--cream)",
     padding: "1rem",
     maxWidth: "480px",
     margin: "0 auto",
@@ -80,40 +80,47 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "1rem",
-    marginBottom: "1rem",
+    marginBottom: "1.25rem",
   },
   backBtn: {
-    padding: "0.4rem 0.8rem",
-    background: "#666",
-    color: "#fff",
+    padding: "0.5rem 1rem",
+    background: "var(--brown-light)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "6px",
+    borderRadius: "8px",
     cursor: "pointer",
   },
   title: {
     margin: 0,
-    color: "#1a5276",
-    fontSize: "1.25rem",
+    color: "var(--brown-dark)",
+    fontSize: "1.3rem",
   },
-  card: {
-    background: "#fff",
-    padding: "1rem",
-    borderRadius: "12px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+  searchCard: {
+    background: "var(--cream-light)",
+    padding: "0.75rem",
+    borderRadius: "14px",
+    boxShadow: "0 4px 12px rgba(62, 39, 35, 0.08)",
     marginBottom: "1rem",
   },
   searchInput: {
     width: "100%",
-    padding: "0.75rem",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
+    padding: "0.85rem 1rem",
+    border: "2px solid var(--brown-light)",
+    borderRadius: "10px",
     fontSize: "1rem",
     boxSizing: "border-box",
+    background: "var(--white)",
+  },
+  resultsCard: {
+    background: "var(--cream-light)",
+    padding: "1rem",
+    borderRadius: "14px",
+    boxShadow: "0 4px 16px rgba(62, 39, 35, 0.08)",
   },
   empty: {
     textAlign: "center",
-    color: "#999",
-    padding: "1rem",
+    color: "var(--brown-light)",
+    padding: "1.5rem",
   },
   list: {
     display: "flex",
@@ -124,29 +131,29 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "0.75rem",
-    background: "#fafafa",
-    borderRadius: "8px",
+    padding: "0.85rem",
+    background: "var(--cream)",
+    borderRadius: "10px",
     cursor: "pointer",
-    border: "1px solid #f0f0f0",
+    transition: "background 0.2s",
   },
   listLeft: {},
   listName: {
     fontWeight: "600",
-    color: "#333",
+    color: "var(--brown-dark)",
     marginBottom: "0.15rem",
   },
   listCode: {
-    color: "#888",
+    color: "var(--brown-light)",
     fontSize: "0.85rem",
   },
   listRight: {},
   pointsBadge: {
-    background: "#e8f5e9",
-    color: "#2d6a4f",
+    background: "var(--gold)",
+    color: "var(--brown-dark)",
     padding: "0.25rem 0.6rem",
     borderRadius: "12px",
     fontSize: "0.8rem",
-    fontWeight: "bold",
+    fontWeight: "600",
   },
 };

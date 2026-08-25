@@ -19,11 +19,11 @@ export default function PointHistory() {
         <button style={styles.backBtn} onClick={() => navigate("/customer/dashboard")}>Back</button>
         <h1 style={styles.title}>My Points</h1>
       </div>
-      <div style={styles.card}><p style={styles.empty}>{error}</p></div>
+        <div style={styles.card}><p style={styles.empty}>{error}</p></div>
     </div>
   );
 
-  if (points === null) return <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>Loading...</div>;
+  if (points === null) return <div style={styles.loading}>Loading...</div>;
 
   const formatDate = (d) => new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   const formatTime = (d) => new Date(d).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
@@ -35,7 +35,7 @@ export default function PointHistory() {
         <h1 style={styles.title}>My Points</h1>
       </div>
 
-      <div style={styles.summary}>
+      <div style={styles.summaryCard}>
         <span style={styles.summaryLabel}>Total Earned</span>
         <span style={styles.summaryValue}>{points.length} points</span>
       </div>
@@ -74,7 +74,7 @@ export default function PointHistory() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#f0f2f5",
+    background: "var(--cream)",
     padding: "1rem",
     maxWidth: "480px",
     margin: "0 auto",
@@ -83,49 +83,49 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "1rem",
-    marginBottom: "1rem",
+    marginBottom: "1.25rem",
   },
   backBtn: {
-    padding: "0.4rem 0.8rem",
-    background: "#666",
-    color: "#fff",
+    padding: "0.5rem 1rem",
+    background: "var(--brown-light)",
+    color: "var(--cream)",
     border: "none",
-    borderRadius: "6px",
+    borderRadius: "8px",
     cursor: "pointer",
   },
   title: {
     margin: 0,
-    color: "#2d6a4f",
-    fontSize: "1.25rem",
+    color: "var(--brown-dark)",
+    fontSize: "1.4rem",
   },
-  summary: {
+  summaryCard: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    background: "#fff",
+    background: "var(--brown-dark)",
     padding: "1rem 1.25rem",
-    borderRadius: "12px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    borderRadius: "14px",
     marginBottom: "1rem",
+    color: "var(--cream)",
   },
   summaryLabel: {
-    color: "#666",
     fontSize: "0.95rem",
   },
   summaryValue: {
-    color: "#2d6a4f",
-    fontWeight: "bold",
+    fontWeight: "700",
     fontSize: "1.1rem",
+    color: "var(--gold)",
   },
   card: {
-    background: "#fff",
+    background: "var(--cream-light)",
     padding: "1.25rem",
-    borderRadius: "12px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    borderRadius: "14px",
+    boxShadow: "0 4px 16px rgba(62, 39, 35, 0.08)",
   },
   empty: {
     textAlign: "center",
-    color: "#999",
+    color: "var(--brown-light)",
+    padding: "1rem",
   },
   table: {
     width: "100%",
@@ -133,16 +133,24 @@ const styles = {
   },
   th: {
     textAlign: "left",
-    padding: "0.5rem",
-    borderBottom: "2px solid #eee",
-    color: "#2d6a4f",
+    padding: "0.65rem 0.5rem",
+    borderBottom: "2px solid var(--brown-light)",
+    color: "var(--brown-dark)",
+    fontSize: "0.85rem",
   },
   td: {
-    padding: "0.5rem",
-    borderBottom: "1px solid #f0f0f0",
+    padding: "0.65rem 0.5rem",
+    borderBottom: "1px solid rgba(141, 110, 99, 0.2)",
   },
   time: {
-    color: "#999",
+    color: "var(--brown-light)",
     fontSize: "0.8rem",
+  },
+  loading: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "100vh",
+    color: "var(--brown-dark)",
   },
 };

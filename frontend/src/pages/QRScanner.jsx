@@ -40,7 +40,7 @@ export default function QRScanner() {
       return;
     }
 
-    setError("Invalid QR code. Please scan a uab Cafe QR or enter code manually.");
+    setError("Invalid QR code. Please scan a uab cafe QR or enter code manually.");
   };
 
   const startScanner = async () => {

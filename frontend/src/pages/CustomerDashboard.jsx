@@ -2,11 +2,15 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 import CoffeeCup from "../components/CoffeeCup";
+import TumblerCard from "../components/TumblerCard";
+import ActivityItem from "../components/ActivityItem";
+import BottomNav from "../components/BottomNav";
 
 export default function CustomerDashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const name = localStorage.getItem("name") || "User";
 
   const loadData = useCallback(() => {
     setError("");
@@ -24,6 +28,15 @@ export default function CustomerDashboard() {
     navigate("/login");
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+
+  const getInitial = (n) => n ? n.charAt(0).toUpperCase() : "U";
+
   if (error && !data) return (
     <div style={styles.page}>
       <div style={styles.errorCard}>
@@ -35,75 +48,101 @@ export default function CustomerDashboard() {
 
   if (!data) return <div style={styles.loading}>Loading...</div>;
 
-  const { customer, progress } = data;
+  const { customer, progress, history } = data;
+
+  const recentActivity = history ? history.slice(0, 3) : [];
 
   return (
     <div style={styles.page}>
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.title}>uab Cafe</h1>
-        <button style={styles.logoutBtn} onClick={logout}>Logout</button>
+        <div style={styles.headerLeft}>
+          <p style={styles.greeting}>{getGreeting()}</p>
+          <h1 style={styles.name}>{name}</h1>
+        </div>
+        <div style={styles.headerRight}>
+          <div style={styles.avatar}>{getInitial(name)}</div>
+          <button style={styles.logoutBtn} onClick={logout}>Logout</button>
+        </div>
       </div>
 
-      {/* Wallet Card */}
+      {/* Coffee Stamp Card */}
       <div style={styles.walletCard}>
         <div style={styles.walletHeader}>
-          <h2 style={styles.walletTitle}>Coffee Card</h2>
+          <div>
+            <h2 style={styles.walletTitle}>Coffee Card</h2>
+            <p style={styles.walletCode}>{customer.customer_code}</p>
+          </div>
           <span style={styles.pointsBadge}>{customer.total_points} pts</span>
         </div>
-        <p style={styles.walletCode}>{customer.customer_code}</p>
 
-        {/* Coffee Stamp Grid */}
         <div style={styles.stampSection}>
           <div style={styles.stampGrid}>
             {Array.from({ length: 10 }, (_, i) => (
               <div key={i} style={styles.stampItem}>
-                <CoffeeCup filled={i < progress.coffee_progress} size={44} />
+                <CoffeeCup filled={i < progress.coffee_progress} size={40} />
               </div>
             ))}
           </div>
           <div style={styles.stampInfo}>
-            <span>Remaining: {10 - progress.coffee_progress}</span>
-            <span>Stamps: {String(progress.coffee_progress).padStart(2, '0')}</span>
+            <span style={styles.stampLabel}>Remaining: {10 - progress.coffee_progress}</span>
+            <span style={styles.stampLabel}>Stamps: {String(progress.coffee_progress).padStart(2, '0')}</span>
           </div>
         </div>
 
-        {/* Reward Available */}
         {progress.coffee_reward_available && (
-          <div style={styles.rewardBanner}>
-            Reward Available: Free Coffee!
-          </div>
+          <div style={styles.rewardBanner}>Free Coffee Ready!</div>
         )}
+      </div>
 
-        {/* Tumbler Progress */}
-        <div style={styles.tumblerSection}>
-          <div style={styles.tumblerHeader}>
-            <span style={styles.tumblerLabel}>Tumbler Progress</span>
-            <span style={styles.tumblerCount}>{progress.tumbler_progress}/80</span>
-          </div>
-          <div style={styles.progressBarBg}>
-            <div style={{ ...styles.progressBarFill, width: `${(progress.tumbler_progress / 80) * 100}%` }} />
-          </div>
-          {progress.tumbler_reward_available && (
-            <div style={styles.rewardBanner}>Free Tumbler Ready!</div>
-          )}
+      {/* Tumbler Reward */}
+      <div style={styles.section}>
+        <TumblerCard
+          progress={progress.tumbler_progress}
+          max={80}
+          rewardAvailable={progress.tumbler_reward_available}
+        />
+      </div>
+
+      {/* Quick Actions */}
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>Quick Actions</h3>
+        <div style={styles.actionsGrid}>
+          <button style={styles.actionCard} onClick={() => navigate("/customer/qr")}>
+            <span style={styles.actionIcon}>📱</span>
+            <span style={styles.actionLabel}>My QR</span>
+          </button>
+          <button style={styles.actionCard} onClick={() => navigate("/customer/points")}>
+            <span style={styles.actionIcon}>💰</span>
+            <span style={styles.actionLabel}>Points</span>
+          </button>
+          <button style={styles.actionCard} onClick={() => navigate("/customer/history")}>
+            <span style={styles.actionIcon}>📜</span>
+            <span style={styles.actionLabel}>History</span>
+          </button>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div style={styles.actions}>
-        <button style={styles.primaryBtn} onClick={() => navigate("/customer/qr")}>
-          My QR Code
-        </button>
-        <div style={styles.secondaryRow}>
-          <button style={styles.secondaryBtn} onClick={() => navigate("/customer/points")}>
-            My Points
-          </button>
-          <button style={styles.secondaryBtn} onClick={() => navigate("/customer/history")}>
-            History
-          </button>
+      {/* Recent Activity */}
+      {recentActivity.length > 0 && (
+        <div style={styles.section}>
+          <h3 style={styles.sectionTitle}>Recent Activity</h3>
+          <div style={styles.activityCard}>
+            {recentActivity.map((item) => (
+              <ActivityItem
+                key={item.id}
+                type={item.reward_type === "coffee" || item.reward_type === "tumbler" ? "reward" : "point"}
+                text={item.reward_type === "coffee" ? "Free Coffee Redeemed" : item.reward_type === "tumbler" ? "Free Tumbler Redeemed" : `+${item.points || 1} Point`}
+                time={item.redeemed_at || item.created_at}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Bottom spacing for nav */}
+      <div style={{ height: "80px" }} />
+      <BottomNav role="customer" />
     </div>
   );
 }
@@ -115,6 +154,7 @@ const styles = {
     padding: "1rem",
     maxWidth: "480px",
     margin: "0 auto",
+    paddingBottom: "1rem",
   },
   header: {
     display: "flex",
@@ -122,24 +162,49 @@ const styles = {
     alignItems: "center",
     marginBottom: "1.25rem",
   },
-  title: {
+  headerLeft: {
+    flex: 1,
+  },
+  greeting: {
     margin: 0,
-    color: "var(--brown-dark)",
-    fontSize: "1.5rem",
+    fontSize: "0.85rem",
+    color: "var(--brown-light)",
+  },
+  name: {
+    margin: "0.15rem 0 0",
+    fontSize: "1.4rem",
     fontWeight: "700",
+    color: "var(--brown-dark)",
+  },
+  headerRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.75rem",
+  },
+  avatar: {
+    width: "42px",
+    height: "42px",
+    borderRadius: "50%",
+    background: "var(--brown-dark)",
+    color: "var(--cream)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "1.1rem",
+    fontWeight: "600",
   },
   logoutBtn: {
-    padding: "0.5rem 1rem",
-    background: "var(--brown-light)",
-    color: "var(--cream)",
-    border: "none",
+    padding: "0.4rem 0.75rem",
+    background: "transparent",
+    color: "var(--brown-light)",
+    border: "1px solid var(--brown-light)",
     borderRadius: "8px",
     cursor: "pointer",
-    fontSize: "0.85rem",
+    fontSize: "0.8rem",
   },
   walletCard: {
     background: "var(--brown-dark)",
-    padding: "1.5rem",
+    padding: "1.25rem",
     borderRadius: "20px",
     marginBottom: "1rem",
     color: "var(--cream)",
@@ -147,39 +212,38 @@ const styles = {
   walletHeader: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "0.25rem",
+    alignItems: "flex-start",
+    marginBottom: "1rem",
   },
   walletTitle: {
     margin: 0,
-    fontSize: "1.25rem",
+    fontSize: "1.15rem",
     fontWeight: "600",
+  },
+  walletCode: {
+    margin: "0.2rem 0 0",
+    fontSize: "0.75rem",
+    color: "var(--brown-light)",
+    letterSpacing: "0.1em",
   },
   pointsBadge: {
     background: "var(--gold)",
     color: "var(--brown-dark)",
-    padding: "0.25rem 0.75rem",
+    padding: "0.3rem 0.75rem",
     borderRadius: "20px",
     fontSize: "0.85rem",
     fontWeight: "600",
   },
-  walletCode: {
-    margin: "0 0 1.25rem",
-    color: "var(--brown-light)",
-    fontSize: "0.85rem",
-    letterSpacing: "0.1em",
-  },
   stampSection: {
     background: "var(--cream-light)",
     borderRadius: "12px",
-    padding: "1rem",
-    marginBottom: "1rem",
+    padding: "0.85rem",
   },
   stampGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(5, 1fr)",
-    gap: "0.5rem",
-    marginBottom: "0.75rem",
+    gap: "0.4rem",
+    marginBottom: "0.6rem",
   },
   stampItem: {
     display: "flex",
@@ -189,80 +253,62 @@ const styles = {
   stampInfo: {
     display: "flex",
     justifyContent: "space-between",
+  },
+  stampLabel: {
     color: "var(--brown-dark)",
-    fontSize: "0.85rem",
+    fontSize: "0.8rem",
     fontWeight: "500",
   },
   rewardBanner: {
     background: "var(--gold)",
     color: "var(--brown-dark)",
-    padding: "0.65rem",
+    padding: "0.6rem",
     borderRadius: "8px",
     textAlign: "center",
     fontWeight: "600",
-    fontSize: "0.9rem",
+    fontSize: "0.85rem",
+    marginTop: "0.85rem",
+  },
+  section: {
     marginBottom: "1rem",
   },
-  tumblerSection: {
-    marginTop: "0.5rem",
-  },
-  tumblerHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "0.5rem",
-  },
-  tumblerLabel: {
-    fontSize: "0.9rem",
-    color: "var(--cream)",
-  },
-  tumblerCount: {
-    fontSize: "0.9rem",
-    color: "var(--gold)",
+  sectionTitle: {
+    margin: "0 0 0.65rem",
+    fontSize: "0.95rem",
     fontWeight: "600",
+    color: "var(--brown-dark)",
   },
-  progressBarBg: {
-    width: "100%",
-    height: "10px",
-    background: "var(--brown-light)",
-    borderRadius: "5px",
-    overflow: "hidden",
+  actionsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "0.65rem",
   },
-  progressBarFill: {
-    height: "100%",
-    background: "var(--gold)",
-    borderRadius: "5px",
-    transition: "width 0.3s",
-  },
-  actions: {
+  actionCard: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.75rem",
-  },
-  primaryBtn: {
-    width: "100%",
-    padding: "1rem",
-    background: "var(--brown-dark)",
-    color: "var(--cream)",
-    border: "none",
-    borderRadius: "12px",
-    fontSize: "1rem",
-    fontWeight: "600",
-    cursor: "pointer",
-  },
-  secondaryRow: {
-    display: "flex",
-    gap: "0.75rem",
-  },
-  secondaryBtn: {
-    flex: 1,
-    padding: "0.85rem",
+    alignItems: "center",
+    gap: "0.35rem",
+    padding: "0.85rem 0.5rem",
     background: "var(--cream-light)",
-    color: "var(--brown-dark)",
-    border: "2px solid var(--brown-mid)",
-    borderRadius: "12px",
-    fontSize: "0.95rem",
-    fontWeight: "500",
+    border: "none",
+    borderRadius: "14px",
     cursor: "pointer",
+    boxShadow: "0 2px 8px rgba(62, 39, 35, 0.06)",
+    transition: "transform 0.2s",
+  },
+  actionIcon: {
+    fontSize: "1.4rem",
+  },
+  actionLabel: {
+    fontSize: "0.75rem",
+    fontWeight: "500",
+    color: "var(--brown-dark)",
+  },
+  activityCard: {
+    background: "var(--cream-light)",
+    borderRadius: "14px",
+    padding: "0.5rem 0.85rem",
+    boxShadow: "0 2px 8px rgba(62, 39, 35, 0.06)",
   },
   loading: {
     display: "flex",

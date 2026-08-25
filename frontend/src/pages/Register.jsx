@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
 import logo from "../assets/uabcafe-logo.jpg";
-import uabOutside from "../assets/uab-outside.jpg";
+import bgImage from "../assets/uab-outside.jpg";
 
 export default function Register() {
   const [form, setForm] = useState({ name: "", username: "", password: "", confirmPassword: "" });
@@ -36,7 +36,7 @@ export default function Register() {
   };
 
   return (
-    <div style={{ ...styles.container, backgroundImage: `url(${uabOutside})` }}>
+    <div style={{ ...styles.container, backgroundImage: `url(${bgImage})` }}>
       <div style={styles.overlay} />
       <div style={styles.card}>
         <img src={logo} alt="uab Cafe" style={styles.logo} />

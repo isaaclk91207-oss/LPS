@@ -93,7 +93,7 @@ export default function CustomerQR() {
       </div>
 
       <div style={styles.qrCard}>
-        <div style={styles.brandBadge}>uab CAFE</div>
+        <div style={styles.brandBadge}>uab cafe</div>
         <h2 style={styles.name}>{customer.name}</h2>
         <p style={styles.code}>{customer.customer_code}</p>
 

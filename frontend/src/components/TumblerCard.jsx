@@ -7,11 +7,11 @@ export default function TumblerCard({ progress = 0, max = 80, rewardAvailable = 
   return (
     <div style={styles.card}>
       <div style={styles.imageContainer}>
-        <img src={tumblerImg} alt="UAB Tumbler" style={styles.image} />
+        <img src={tumblerImg} alt="uab Tumbler" style={styles.image} />
       </div>
       <div style={styles.info}>
         <div style={styles.header}>
-          <h3 style={styles.title}>Free UAB Tumbler</h3>
+          <h3 style={styles.title}>Free uab Tumbler</h3>
           <span style={styles.badge}>{progress}/{max}</span>
         </div>
         <p style={styles.pointsText}>points collected</p>

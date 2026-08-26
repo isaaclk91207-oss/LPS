@@ -17,7 +17,8 @@ from models import User
 SECRET_KEY = os.environ.get("SECRET_KEY", "uab-cafe-loyalty-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
-QR_TOKEN_EXPIRY_SECONDS = 30
+QR_TOKEN_EXPIRY_SECONDS = 120
+QR_TOKEN_CLOCK_SKEW = 10
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/swagger-login")
@@ -113,9 +114,9 @@ def verify_qr_token(token: str) -> int:
     if not hmac.compare_digest(signature, expected_sig):
         raise ValueError("Invalid QR token signature")
 
-    # Check expiry
-    age = int(time.time()) - timestamp
-    if age > QR_TOKEN_EXPIRY_SECONDS:
+    # Check expiry (with clock skew tolerance)
+    age = time.time() - timestamp
+    if age > QR_TOKEN_EXPIRY_SECONDS + QR_TOKEN_CLOCK_SKEW:
         raise ValueError("QR code expired")
 
     return customer_id

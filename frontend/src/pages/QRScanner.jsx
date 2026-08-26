@@ -11,7 +11,7 @@ export default function QRScanner() {
   const scannerRef = useRef(null);
   const navigate = useNavigate();
 
-  const isDynamicToken = (text) => text.trim().startsWith("uab");
+  const isDynamicToken = (text) => text.trim().toUpperCase().startsWith("UAB");
   const isValidManualCode = (text) => /^CUS-\d{3}$/i.test(text.trim());
 
   const handleDecodedText = async (decodedText) => {

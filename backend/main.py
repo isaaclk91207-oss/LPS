@@ -1,5 +1,7 @@
 import io
 import os
+import logging
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
 import qrcode
@@ -24,11 +26,28 @@ from auth import (
 )
 from seed import seed_database
 
-# Create tables
-Base.metadata.create_all(bind=engine)
-seed_database()
+logger = logging.getLogger("uvicorn")
 
-app = FastAPI(title="uab Cafe Loyalty API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables created successfully")
+    except Exception as e:
+        logger.error(f"Failed to create tables: {e}")
+        raise
+
+    try:
+        seed_database()
+        logger.info("Database seeded successfully")
+    except Exception as e:
+        logger.error(f"Failed to seed database: {e}")
+
+    yield
+
+
+app = FastAPI(title="uab Cafe Loyalty API", lifespan=lifespan)
 
 CORS_ORIGINS = os.environ.get(
     "CORS_ORIGINS",
@@ -42,6 +61,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/api/health")
+def health_check(db: Session = Depends(get_db)):
+    from sqlalchemy import text
+    try:
+        db.execute(text("SELECT 1"))
+        user_count = db.query(User).count()
+        return {
+            "status": "ok",
+            "database": "connected",
+            "users": user_count,
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "database": "disconnected",
+            "error": str(e),
+        }
 
 
 # ──────────────────────────────────────────────

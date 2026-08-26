@@ -9,12 +9,16 @@ export default function QRScanner() {
   const [error, setError] = useState("");
   const [scannedCode, setScannedCode] = useState("");
   const scannerRef = useRef(null);
+  const processingRef = useRef(false);
   const navigate = useNavigate();
 
   const isDynamicToken = (text) => text.trim().toUpperCase().startsWith("UAB");
   const isValidManualCode = (text) => /^CUS-\d{3}$/i.test(text.trim());
 
   const handleDecodedText = async (decodedText) => {
+    if (processingRef.current) return;
+    processingRef.current = true;
+
     let code = decodedText.trim();
 
     // Handle JSON-formatted QR codes
@@ -26,32 +30,34 @@ export default function QRScanner() {
     }
 
     if (isDynamicToken(code)) {
+      stopScanner();
       setScannedCode("Verifying...");
       try {
         const res = await api.post("/barista/scan", { customer_code: code });
         const customer = res.data;
-        stopScanner();
         setTimeout(() => navigate(`/barista/customer/${customer.customer_code}`), 500);
       } catch (err) {
+        processingRef.current = false;
         const detail = err.response?.data?.detail || "Invalid or expired QR code.";
         setError(detail);
         setScannedCode("");
-        stopScanner();
       }
       return;
     }
 
     if (isValidManualCode(code.toUpperCase())) {
-      setScannedCode(code.toUpperCase());
       stopScanner();
+      setScannedCode(code.toUpperCase());
       setTimeout(() => navigate(`/barista/customer/${code.toUpperCase()}`), 500);
       return;
     }
 
+    processingRef.current = false;
     setError("Invalid QR code. Please scan a uab cafe QR or enter code manually.");
   };
 
   const startScanner = async () => {
+    processingRef.current = false;
     setError("");
     setScannedCode("");
     setScanning(true);

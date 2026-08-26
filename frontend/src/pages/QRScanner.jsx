@@ -8,6 +8,7 @@ export default function QRScanner() {
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
   const [scannedCode, setScannedCode] = useState("");
+  const [verifiedCustomer, setVerifiedCustomer] = useState(null);
   const scannerRef = useRef(null);
   const processingRef = useRef(false);
   const navigate = useNavigate();
@@ -35,7 +36,8 @@ export default function QRScanner() {
       try {
         const res = await api.post("/barista/scan", { customer_code: code });
         const customer = res.data;
-        setTimeout(() => navigate(`/barista/customer/${customer.customer_code}`), 500);
+        setVerifiedCustomer(customer);
+        setScannedCode(`${customer.name} — ${customer.customer_code}`);
       } catch (err) {
         processingRef.current = false;
         const detail = err.response?.data?.detail || "Invalid or expired QR code.";
@@ -48,7 +50,7 @@ export default function QRScanner() {
     if (isValidManualCode(code.toUpperCase())) {
       stopScanner();
       setScannedCode(code.toUpperCase());
-      setTimeout(() => navigate(`/barista/customer/${code.toUpperCase()}`), 500);
+      navigate(`/barista/customer/${code.toUpperCase()}`);
       return;
     }
 
@@ -119,6 +121,16 @@ export default function QRScanner() {
       {error && <div style={styles.error}>{error}</div>}
       {scannedCode && <div style={styles.successBanner}>{scannedCode}</div>}
 
+      {verifiedCustomer && (
+        <button
+          style={styles.continueBtn}
+          onClick={() => navigate(`/barista/customer/${verifiedCustomer.customer_code}`, { state: { customer: verifiedCustomer } })}
+        >
+          Continue to {verifiedCustomer.name}
+        </button>
+      )}
+
+      {!verifiedCustomer && (
       <div style={styles.card}>
         <div style={styles.scannerContainer}>
           <div id="qr-reader" style={styles.qrReader} />
@@ -140,7 +152,9 @@ export default function QRScanner() {
           <button style={styles.stopBtn} onClick={stopScanner}>Stop Camera</button>
         )}
       </div>
+      )}
 
+      {!verifiedCustomer && (
       <div style={styles.card}>
         <div style={styles.divider}>
           <span style={styles.dividerLine} />
@@ -158,6 +172,7 @@ export default function QRScanner() {
           <button style={styles.lookupBtn} type="submit">Look Up Customer</button>
         </form>
       </div>
+      )}
     </div>
   );
 }
@@ -273,6 +288,18 @@ const styles = {
     fontSize: "1rem",
     fontWeight: "600",
     cursor: "pointer",
+  },
+  continueBtn: {
+    width: "100%",
+    padding: "1rem",
+    background: "var(--brown-dark)",
+    color: "var(--cream)",
+    border: "none",
+    borderRadius: "12px",
+    fontSize: "1.1rem",
+    fontWeight: "600",
+    cursor: "pointer",
+    marginBottom: "1rem",
   },
   divider: {
     display: "flex",

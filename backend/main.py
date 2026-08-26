@@ -332,9 +332,11 @@ def scan_qr_token(
     current_user: User = Depends(require_role("barista")),
 ):
     """Verify a dynamic QR token and return customer info."""
+    logger.info(f"Barista scan request: customer_code={data.customer_code!r}")
     try:
         customer_id = verify_qr_token(data.customer_code)
     except ValueError as e:
+        logger.error(f"Barista scan failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
     user = db.query(User).filter(User.id == customer_id, User.role == "customer").first()

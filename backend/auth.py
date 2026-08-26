@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import hmac
@@ -13,6 +14,8 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User
+
+logger = logging.getLogger("uvicorn")
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "uab-cafe-loyalty-secret-key-change-in-production")
 ALGORITHM = "HS256"
@@ -94,29 +97,42 @@ def create_qr_token(customer_id: int) -> str:
 
 def verify_qr_token(token: str) -> int:
     """Verify QR token and return customer_id. Raises ValueError if invalid/expired."""
+    logger.info(f"QR verify: raw token = {token!r}")
+
     if not token.startswith("UAB"):
+        logger.error("QR verify: Invalid format - does not start with UAB")
         raise ValueError("Invalid QR token format")
 
     parts = token[3:].split(".")
     if len(parts) != 3:
+        logger.error(f"QR verify: Invalid structure - got {len(parts)} parts, expected 3")
         raise ValueError("Invalid QR token structure")
 
     customer_id_str, timestamp_str, signature = parts
+    logger.info(f"QR verify: customer_id={customer_id_str}, timestamp={timestamp_str}, signature={signature}")
 
     try:
         customer_id = int(customer_id_str)
         timestamp = int(timestamp_str)
     except ValueError:
+        logger.error("QR verify: Invalid data - cannot parse customer_id or timestamp")
         raise ValueError("Invalid QR token data")
 
     # Verify signature
     expected_sig = _hmac_sign(f"{customer_id}.{timestamp}")
+    logger.info(f"QR verify: expected_sig={expected_sig}, got_sig={signature}, match={hmac.compare_digest(signature, expected_sig)}")
     if not hmac.compare_digest(signature, expected_sig):
+        logger.error("QR verify: Signature mismatch!")
         raise ValueError("Invalid QR token signature")
 
     # Check expiry (with clock skew tolerance)
-    age = time.time() - timestamp
-    if age > QR_TOKEN_EXPIRY_SECONDS + QR_TOKEN_CLOCK_SKEW:
+    now = time.time()
+    age = now - timestamp
+    max_age = QR_TOKEN_EXPIRY_SECONDS + QR_TOKEN_CLOCK_SKEW
+    logger.info(f"QR verify: now={now}, token_time={timestamp}, age={age:.1f}s, max={max_age}s, valid={age <= max_age}")
+    if age > max_age:
+        logger.error(f"QR verify: Expired - age {age:.1f}s > max {max_age}s")
         raise ValueError("QR code expired")
 
+    logger.info(f"QR verify: SUCCESS - customer_id={customer_id}")
     return customer_id

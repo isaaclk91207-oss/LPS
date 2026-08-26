@@ -8,21 +8,22 @@ export default function QRScanner() {
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
   const [scannedCode, setScannedCode] = useState("");
-  const [verifiedCustomer, setVerifiedCustomer] = useState(null);
   const scannerRef = useRef(null);
   const processingRef = useRef(false);
   const navigate = useNavigate();
 
-  const isDynamicToken = (text) => text.trim().toUpperCase().startsWith("UAB");
-  const isValidManualCode = (text) => /^CUS-\d{3}$/i.test(text.trim());
+  useEffect(() => {
+    processingRef.current = false;
+  }, []);
 
   const handleDecodedText = async (decodedText) => {
+    console.log("Scanned text:", decodedText);
+
     if (processingRef.current) return;
     processingRef.current = true;
 
     let code = decodedText.trim();
 
-    // Handle JSON-formatted QR codes
     if (code.startsWith("{")) {
       try {
         const parsed = JSON.parse(code);
@@ -30,32 +31,26 @@ export default function QRScanner() {
       } catch {}
     }
 
-    if (isDynamicToken(code)) {
-      stopScanner();
+    stopScanner();
+
+    if (code.toUpperCase().startsWith("UAB") || /^CUS-\d{3}$/i.test(code)) {
       setScannedCode("Verifying...");
       try {
         const res = await api.post("/barista/scan", { customer_code: code });
-        const customer = res.data;
-        setVerifiedCustomer(customer);
-        setScannedCode(`${customer.name} — ${customer.customer_code}`);
+        if (res.data) {
+          navigate(`/barista/customer/${res.data.customer_code}`, { state: { customer: res.data } });
+          return;
+        }
       } catch (err) {
-        processingRef.current = false;
         const detail = err.response?.data?.detail || "Invalid or expired QR code.";
         setError(detail);
-        setScannedCode("");
       }
-      return;
-    }
-
-    if (isValidManualCode(code.toUpperCase())) {
-      stopScanner();
-      setScannedCode(code.toUpperCase());
-      navigate(`/barista/customer/${code.toUpperCase()}`);
-      return;
+    } else {
+      setError("Invalid QR code. Please scan a uab cafe QR or enter code manually.");
     }
 
     processingRef.current = false;
-    setError("Invalid QR code. Please scan a uab cafe QR or enter code manually.");
+    setScannedCode("");
   };
 
   const startScanner = async () => {
@@ -103,7 +98,7 @@ export default function QRScanner() {
     e.preventDefault();
     const code = manualCode.trim().toUpperCase();
     if (!code) return;
-    if (!isValidManualCode(code)) {
+    if (!/^CUS-\d{3}$/i.test(code)) {
       setError("Invalid code format. Use: CUS-001");
       return;
     }
@@ -121,16 +116,6 @@ export default function QRScanner() {
       {error && <div style={styles.error}>{error}</div>}
       {scannedCode && <div style={styles.successBanner}>{scannedCode}</div>}
 
-      {verifiedCustomer && (
-        <button
-          style={styles.continueBtn}
-          onClick={() => navigate(`/barista/customer/${verifiedCustomer.customer_code}`, { state: { customer: verifiedCustomer } })}
-        >
-          Continue to {verifiedCustomer.name}
-        </button>
-      )}
-
-      {!verifiedCustomer && (
       <div style={styles.card}>
         <div style={styles.scannerContainer}>
           <div id="qr-reader" style={styles.qrReader} />
@@ -152,9 +137,7 @@ export default function QRScanner() {
           <button style={styles.stopBtn} onClick={stopScanner}>Stop Camera</button>
         )}
       </div>
-      )}
 
-      {!verifiedCustomer && (
       <div style={styles.card}>
         <div style={styles.divider}>
           <span style={styles.dividerLine} />
@@ -172,7 +155,6 @@ export default function QRScanner() {
           <button style={styles.lookupBtn} type="submit">Look Up Customer</button>
         </form>
       </div>
-      )}
     </div>
   );
 }
@@ -288,18 +270,6 @@ const styles = {
     fontSize: "1rem",
     fontWeight: "600",
     cursor: "pointer",
-  },
-  continueBtn: {
-    width: "100%",
-    padding: "1rem",
-    background: "var(--brown-dark)",
-    color: "var(--cream)",
-    border: "none",
-    borderRadius: "12px",
-    fontSize: "1.1rem",
-    fontWeight: "600",
-    cursor: "pointer",
-    marginBottom: "1rem",
   },
   divider: {
     display: "flex",

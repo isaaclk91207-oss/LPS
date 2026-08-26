@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import api from "../api";
 import ToastContainer, { useToast } from "../components/Toast";
 import ConfirmDialog from "../components/ConfirmDialog";
 
 export default function CustomerDetail() {
   const { code } = useParams();
-  const [customer, setCustomer] = useState(null);
+  const location = useLocation();
+  const [customer, setCustomer] = useState(location.state?.customer || null);
   const [error, setError] = useState("");
   const [confirmAction, setConfirmAction] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -14,11 +15,12 @@ export default function CustomerDetail() {
   const navigate = useNavigate();
 
   const loadCustomer = useCallback(() => {
+    if (customer) return;
     setError("");
     api.get(`/barista/customer/${code}`)
       .then((res) => setCustomer(res.data))
       .catch(() => setError("Customer not found"));
-  }, [code]);
+  }, [code, customer]);
 
   useEffect(loadCustomer, [loadCustomer]);
 

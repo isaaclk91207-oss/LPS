@@ -31,7 +31,12 @@ export default function QRScanner() {
     try {
       const res = await api.post("/barista/scan", { customer_code: code });
       if (res.data) {
-        stopScanner();
+        if (scannerRef.current) {
+          await scannerRef.current.stop().catch(() => {});
+          await scannerRef.current.clear().catch(() => {});
+          scannerRef.current = null;
+        }
+        setError("");
         navigate(`/barista/customer/${res.data.customer_code}`, {
           state: { customer: res.data },
           replace: true,
@@ -39,12 +44,12 @@ export default function QRScanner() {
         return;
       }
     } catch (err) {
-      console.error("Scan Navigation Error:", err);
+      console.error("Scan Process Error:", err);
       const detail = err.response?.data?.detail || "Scan failed";
       setError(detail);
+      processingRef.current = false;
     }
 
-    processingRef.current = false;
     setScannedCode("");
   };
 

@@ -1,4 +1,5 @@
 import io
+import os
 from datetime import datetime, timezone
 
 import qrcode
@@ -29,9 +30,14 @@ seed_database()
 
 app = FastAPI(title="uab Cafe Loyalty API")
 
+CORS_ORIGINS = os.environ.get(
+    "CORS_ORIGINS",
+    "http://localhost:5173",
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://192.168.40.76:5173"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

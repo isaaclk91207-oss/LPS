@@ -29,7 +29,7 @@ def seed_database():
         logger.info("Created barista: barista / barista123")
 
         demo_customers = [
-            ("aungaung", "Aung Aung", "pass123", 5),
+            # ("aungaung", "Aung Aung", "pass123", 5),
             ("kyikyi", "Kyi Kyi", "pass123", 25),
             ("minaung", "Min Aung", "pass123", 75),
         ]

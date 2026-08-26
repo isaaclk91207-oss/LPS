@@ -11,11 +11,19 @@ export default function QRScanner() {
   const scannerRef = useRef(null);
   const navigate = useNavigate();
 
-  const isDynamicToken = (text) => text.trim().toUpperCase().startsWith("uab");
+  const isDynamicToken = (text) => text.trim().toUpperCase().startsWith("UAB");
   const isValidManualCode = (text) => /^CUS-\d{3}$/i.test(text.trim());
 
   const handleDecodedText = async (decodedText) => {
-    const code = decodedText.trim();
+    let code = decodedText.trim();
+
+    // Handle JSON-formatted QR codes
+    if (code.startsWith("{")) {
+      try {
+        const parsed = JSON.parse(code);
+        code = parsed.token || parsed.customer_code || parsed.code || "";
+      } catch {}
+    }
 
     if (isDynamicToken(code)) {
       setScannedCode("Verifying...");

@@ -39,6 +39,7 @@ export default function QRScanner() {
         return;
       }
     } catch (err) {
+      console.error("Scan Navigation Error:", err);
       const detail = err.response?.data?.detail || "Scan failed";
       setError(detail);
     }

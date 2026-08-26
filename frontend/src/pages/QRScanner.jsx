@@ -30,23 +30,31 @@ export default function QRScanner() {
     setScannedCode("Verifying...");
     try {
       const res = await api.post("/barista/scan", { customer_code: code });
-      if (res.data) {
-        if (scannerRef.current) {
-          await scannerRef.current.stop().catch(() => {});
-          await scannerRef.current.clear().catch(() => {});
-          scannerRef.current = null;
+      const customerData = res.data;
+
+      if (customerData && (customerData.customer_code || customerData.id)) {
+        const codeToNavigate = customerData.customer_code || customerData.id;
+
+        try {
+          if (scannerRef.current) {
+            await scannerRef.current.stop();
+            await scannerRef.current.clear();
+            scannerRef.current = null;
+          }
+        } catch (e) {
+          console.warn("Scanner stop warning:", e);
         }
+
         setError("");
-        navigate(`/barista/customer/${res.data.customer_code}`, {
-          state: { customer: res.data },
+        navigate(`/barista/customer/${codeToNavigate}`, {
+          state: { customer: customerData },
           replace: true,
         });
         return;
       }
     } catch (err) {
-      console.error("Scan Process Error:", err);
-      const detail = err.response?.data?.detail || "Scan failed";
-      setError(detail);
+      console.error("Full Scan Exception:", err);
+      setError(err.response?.data?.detail || err.message || "Scan failed");
       processingRef.current = false;
     }
 

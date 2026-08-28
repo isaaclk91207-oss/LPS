@@ -5,6 +5,7 @@ import CoffeeCup from "../components/CoffeeCup";
 import TumblerCard from "../components/TumblerCard";
 import ActivityItem from "../components/ActivityItem";
 import BottomNav from "../components/BottomNav";
+import AvatarStudio, { loadAvatarConfig } from "../components/AvatarStudio";
 import { DashboardSkeleton } from "../components/SkeletonLoader";
 import uabLogo from "../assets/uabcafe-logo.jpg";
 
@@ -12,6 +13,7 @@ export default function CustomerDashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showEditor, setShowEditor] = useState(false);
   const navigate = useNavigate();
   const name = localStorage.getItem("name") || "User";
 
@@ -46,6 +48,12 @@ export default function CustomerDashboard() {
     if (points >= 50) return { label: "Gold Member", color: "var(--gold-bright)", bg: "rgba(212, 175, 55, 0.15)" };
     if (points >= 20) return { label: "Coffee Lover", color: "var(--brown-mid)", bg: "rgba(92, 58, 30, 0.1)" };
     return { label: "New Member", color: "var(--brown-light)", bg: "rgba(141, 110, 99, 0.1)" };
+  };
+
+  const handleSaveAvatar = (config) => {
+    localStorage.setItem("uab_avatar", JSON.stringify(config));
+    window.dispatchEvent(new Event("avatarUpdated"));
+    setShowEditor(false);
   };
 
   if (error && !data) return (
@@ -85,7 +93,9 @@ export default function CustomerDashboard() {
             </span>
           </div>
           <div style={styles.headerRight}>
-            <div style={styles.avatar}>{getInitial(name)}</div>
+            <div style={styles.avatarContainer}>
+              <AvatarStudio size={56} showEditButton={true} onOpenEditor={() => setShowEditor(true)} />
+            </div>
             <button style={styles.logoutBtn} onClick={logout}>Logout</button>
           </div>
         </div>
@@ -173,6 +183,15 @@ export default function CustomerDashboard() {
       {/* Bottom spacing for nav */}
       <div style={{ height: "80px" }} />
       <BottomNav role="customer" />
+
+      {/* Avatar Editor Modal */}
+      {showEditor && (
+        <AvatarStudio.Editor
+          currentConfig={loadAvatarConfig()}
+          onClose={() => setShowEditor(false)}
+          onSave={handleSaveAvatar}
+        />
+      )}
     </div>
   );
 }
@@ -235,17 +254,10 @@ const styles = {
     alignItems: "center",
     gap: "0.75rem",
   },
-  avatar: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%",
-    background: "var(--brown-dark)",
-    color: "var(--cream)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "1.1rem",
-    fontWeight: "600",
+  avatarContainer: {
+    position: "relative",
+    width: "56px",
+    height: "56px",
   },
   logoutBtn: {
     padding: "0.4rem 0.75rem",

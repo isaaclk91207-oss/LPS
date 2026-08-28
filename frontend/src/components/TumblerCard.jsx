@@ -5,7 +5,11 @@ export default function TumblerCard({ progress = 0, max = 80, rewardAvailable = 
   const remaining = max - progress;
 
   return (
-    <div style={styles.card}>
+    <div
+      style={styles.card}
+      onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.01)"; e.currentTarget.style.boxShadow = "0 6px 24px rgba(62, 39, 35, 0.12)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(62, 39, 35, 0.08)"; }}
+    >
       <div style={styles.imageContainer}>
         <img src={tumblerImg} alt="uab Tumbler" style={styles.image} />
       </div>
@@ -14,19 +18,24 @@ export default function TumblerCard({ progress = 0, max = 80, rewardAvailable = 
           <h3 style={styles.title}>Free uab Tumbler</h3>
           <span style={styles.badge}>{progress}/{max}</span>
         </div>
-        <p style={styles.pointsText}>points collected</p>
+        <p style={styles.pointsText}>{percentage.toFixed(0)}% complete</p>
         <div style={styles.progressBg}>
           <div
             style={{
               ...styles.progressFill,
               width: `${percentage}%`,
+              backgroundImage: percentage > 0
+                ? "linear-gradient(90deg, var(--brown-mid) 0%, var(--gold-bright) 40%, var(--gold) 60%, var(--brown-mid) 100%)"
+                : "var(--brown-mid)",
+              backgroundSize: percentage > 0 ? "200% 100%" : "100% 100%",
+              animation: percentage > 0 && percentage < 100 ? "progressShimmer 2s linear infinite" : "none",
             }}
           />
         </div>
         {rewardAvailable ? (
           <div style={styles.readyBadge}>Ready to Redeem!</div>
         ) : (
-          <p style={styles.remaining}>{remaining} more to go</p>
+          <p style={styles.remaining}>{remaining} more points to go</p>
         )}
       </div>
     </div>
@@ -38,10 +47,14 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "1rem",
-    background: "var(--cream-light)",
+    background: "rgba(255, 248, 231, 0.7)",
+    backdropFilter: "blur(6px)",
+    WebkitBackdropFilter: "blur(6px)",
     padding: "1rem",
     borderRadius: "16px",
-    boxShadow: "0 4px 16px rgba(62, 39, 35, 0.08)",
+    boxShadow: "0 4px 20px rgba(62, 39, 35, 0.1)",
+    border: "1px solid rgba(255, 248, 231, 0.5)",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
   },
   imageContainer: {
     flexShrink: 0,
@@ -99,9 +112,8 @@ const styles = {
   },
   progressFill: {
     height: "100%",
-    background: "linear-gradient(90deg, var(--brown-mid) 0%, var(--gold) 100%)",
     borderRadius: "4px",
-    transition: "width 0.5s ease",
+    transition: "width 0.6s ease",
   },
   remaining: {
     margin: 0,
@@ -116,5 +128,6 @@ const styles = {
     borderRadius: "8px",
     fontSize: "0.75rem",
     fontWeight: "600",
+    animation: "pulse 2s ease-in-out infinite",
   },
 };

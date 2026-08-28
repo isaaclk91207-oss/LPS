@@ -32,13 +32,19 @@ export default function BottomNav({ role = "customer" }) {
             }}
             onClick={() => navigate(tab.path)}
           >
-            <span style={styles.icon}>{tab.icon}</span>
+            <span style={{
+              ...styles.icon,
+              ...(isActive ? styles.iconActive : {}),
+            }}>
+              {tab.icon}
+            </span>
             <span style={{
               ...styles.label,
               ...(isActive ? styles.labelActive : {}),
             }}>
               {tab.label}
             </span>
+            {isActive && <span style={styles.activeIndicator} />}
           </button>
         );
       })}
@@ -75,8 +81,9 @@ const styles = {
     border: "none",
     borderRadius: "12px",
     cursor: "pointer",
-    transition: "all 0.2s",
+    transition: "all 0.25s ease",
     minWidth: "60px",
+    position: "relative",
   },
   tabActive: {
     background: "rgba(212, 165, 116, 0.2)",
@@ -84,14 +91,29 @@ const styles = {
   icon: {
     fontSize: "1.3rem",
     lineHeight: 1,
+    transition: "transform 0.2s ease",
+  },
+  iconActive: {
+    transform: "scale(1.15)",
   },
   label: {
     fontSize: "0.7rem",
     color: "var(--brown-light)",
     fontWeight: "500",
+    transition: "color 0.2s ease",
   },
   labelActive: {
     color: "var(--gold)",
     fontWeight: "600",
+  },
+  activeIndicator: {
+    position: "absolute",
+    bottom: "-2px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "20px",
+    height: "3px",
+    borderRadius: "2px",
+    background: "var(--gold)",
   },
 };

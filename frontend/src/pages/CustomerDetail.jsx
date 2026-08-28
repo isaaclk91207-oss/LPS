@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import api from "../api";
 import ToastContainer, { useToast } from "../components/Toast";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { CustomerDetailSkeleton } from "../components/SkeletonLoader";
 
 export default function CustomerDetail() {
   const { code } = useParams();
@@ -11,30 +12,51 @@ export default function CustomerDetail() {
   const [error, setError] = useState("");
   const [confirmAction, setConfirmAction] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [loading, setLoading] = useState(!location.state?.customer);
   const { toasts, addToast } = useToast();
   const navigate = useNavigate();
 
   const loadCustomer = useCallback(() => {
-    if (customer) return;
+    if (customer) { setLoading(false); return; }
     setError("");
+    setLoading(true);
     api.get(`/barista/customer/${code}`)
       .then((res) => setCustomer(res.data))
-      .catch(() => setError("Customer not found"));
+      .catch(() => setError("Customer not found"))
+      .finally(() => setLoading(false));
   }, [code, customer]);
 
   useEffect(loadCustomer, [loadCustomer]);
 
-  const addPoint = () => {
+  const addPoint = (label = "Coffee Stamp") => {
     setConfirmAction({
-      message: `Add 1 loyalty point to ${customer.name}?`,
+      message: `Add +1 ${label} to ${customer.name}?`,
       onConfirm: async () => {
         setActionLoading(true);
         try {
           const res = await api.post("/barista/point", { customer_code: code });
-          addToast(`Point added! Total: ${res.data.progress.current_points}`);
+          addToast(`${label} added! Total: ${res.data.progress.current_points}`);
           loadCustomer();
         } catch (err) {
           addToast(err.response?.data?.detail || "Failed to add point", "error");
+        } finally {
+          setActionLoading(false);
+        }
+      },
+    });
+  };
+
+  const addTumblerPoint = () => {
+    setConfirmAction({
+      message: `Add +1 Tumbler Point to ${customer.name}?`,
+      onConfirm: async () => {
+        setActionLoading(true);
+        try {
+          const res = await api.post("/barista/point", { customer_code: code, point_type: "tumbler" });
+          addToast(`Tumbler point added! Total: ${res.data.progress.current_points}`);
+          loadCustomer();
+        } catch (err) {
+          addToast(err.response?.data?.detail || "Failed to add tumbler point", "error");
         } finally {
           setActionLoading(false);
         }
@@ -74,7 +96,15 @@ export default function CustomerDetail() {
     </div>
   );
 
-  if (!customer) return <div style={styles.loading}>Loading...</div>;
+  if (loading && !customer) return (
+    <div style={styles.page}>
+      <div style={styles.header}>
+        <button style={styles.backBtn} onClick={() => navigate("/barista/scan")}>Back</button>
+        <h1 style={styles.title}>Customer Detail</h1>
+      </div>
+      <CustomerDetailSkeleton />
+    </div>
+  );
 
   return (
     <div style={styles.page}>
@@ -100,6 +130,7 @@ export default function CustomerDetail() {
         <p style={styles.points}>Available Points: <strong>{customer.total_points}</strong></p>
       </div>
 
+      {/* Coffee Reward */}
       <div style={styles.card}>
         <div style={styles.cardHeader}>
           <h3 style={styles.cardTitle}>Coffee Reward</h3>
@@ -109,10 +140,18 @@ export default function CustomerDetail() {
           <div style={{ ...styles.progressBarFill, width: `${(customer.coffee_progress / 10) * 100}%` }} />
         </div>
         {customer.coffee_reward_available && (
-          <button style={styles.redeemBtn} onClick={() => redeem("coffee")}>Redeem Coffee</button>
+          <button
+            style={styles.redeemBtn}
+            onClick={() => redeem("coffee")}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(62, 39, 35, 0.15)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
+          >
+            Redeem Coffee
+          </button>
         )}
       </div>
 
+      {/* Tumbler Reward */}
       <div style={styles.card}>
         <div style={styles.cardHeader}>
           <h3 style={styles.cardTitle}>Tumbler Reward</h3>
@@ -122,13 +161,40 @@ export default function CustomerDetail() {
           <div style={{ ...styles.progressBarFill, width: `${(customer.tumbler_progress / 80) * 100}%` }} />
         </div>
         {customer.tumbler_reward_available && (
-          <button style={styles.redeemBtn} onClick={() => redeem("tumbler")}>Redeem Tumbler</button>
+          <button
+            style={styles.redeemBtn}
+            onClick={() => redeem("tumbler")}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(62, 39, 35, 0.15)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
+          >
+            Redeem Tumbler
+          </button>
         )}
       </div>
 
+      {/* Preset Point Buttons */}
       <div style={styles.card}>
-        <h3 style={styles.cardTitle}>Coffee Purchase</h3>
-        <button style={styles.addPointBtn} onClick={addPoint}>+1 Point</button>
+        <h3 style={{ ...styles.cardTitle, marginBottom: "0.85rem" }}>Quick Add Points</h3>
+        <div style={styles.presetRow}>
+          <button
+            style={{ ...styles.presetBtn, ...styles.presetCoffee }}
+            onClick={() => addPoint("Coffee Stamp")}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.03)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+          >
+            <span style={styles.presetIcon}>☕</span>
+            <span style={styles.presetLabel}>+1 Coffee Stamp</span>
+          </button>
+          <button
+            style={{ ...styles.presetBtn, ...styles.presetTumbler }}
+            onClick={addTumblerPoint}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.03)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+          >
+            <span style={styles.presetIcon}>🥤</span>
+            <span style={styles.presetLabel}>+1 Tumbler Point</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -167,6 +233,7 @@ const styles = {
     borderRadius: "14px",
     marginBottom: "1rem",
     color: "var(--cream)",
+    boxShadow: "0 4px 24px rgba(62, 39, 35, 0.2)",
   },
   name: {
     margin: 0,
@@ -221,7 +288,7 @@ const styles = {
     height: "100%",
     background: "var(--brown-mid)",
     borderRadius: "5px",
-    transition: "width 0.3s",
+    transition: "width 0.4s ease",
   },
   redeemBtn: {
     width: "100%",
@@ -233,6 +300,38 @@ const styles = {
     fontSize: "0.95rem",
     fontWeight: "600",
     cursor: "pointer",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  },
+  presetRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "0.65rem",
+  },
+  presetBtn: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "0.35rem",
+    padding: "0.85rem 0.5rem",
+    border: "none",
+    borderRadius: "14px",
+    cursor: "pointer",
+    transition: "transform 0.2s ease",
+  },
+  presetCoffee: {
+    background: "rgba(92, 58, 30, 0.1)",
+    color: "var(--brown-mid)",
+  },
+  presetTumbler: {
+    background: "rgba(212, 175, 55, 0.15)",
+    color: "var(--brown-dark)",
+  },
+  presetIcon: {
+    fontSize: "1.5rem",
+  },
+  presetLabel: {
+    fontSize: "0.8rem",
+    fontWeight: "600",
   },
   addPointBtn: {
     width: "100%",
@@ -245,12 +344,5 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     marginTop: "0.5rem",
-  },
-  loading: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: "100vh",
-    color: "var(--brown-dark)",
   },
 };

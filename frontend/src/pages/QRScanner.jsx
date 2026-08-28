@@ -8,6 +8,8 @@ export default function QRScanner() {
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
   const [scannedCode, setScannedCode] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successName, setSuccessName] = useState("");
   const scannerRef = useRef(null);
   const processingRef = useRef(false);
   const navigate = useNavigate();
@@ -46,10 +48,16 @@ export default function QRScanner() {
         }
 
         setError("");
-        navigate(`/barista/customer/${codeToNavigate}`, {
-          state: { customer: customerData },
-          replace: true,
-        });
+        setSuccessName(customerData.name || "Customer");
+        setShowSuccess(true);
+
+        setTimeout(() => {
+          setShowSuccess(false);
+          navigate(`/barista/customer/${codeToNavigate}`, {
+            state: { customer: customerData },
+            replace: true,
+          });
+        }, 1200);
         return;
       }
     } catch (err) {
@@ -116,6 +124,17 @@ export default function QRScanner() {
 
   return (
     <div style={styles.page}>
+      {/* Success Overlay */}
+      {showSuccess && (
+        <div style={styles.successOverlay}>
+          <div style={styles.successModal}>
+            <span style={styles.successCheck}>✅</span>
+            <p style={styles.successTitle}>Customer Identified</p>
+            <p style={styles.successName}>{successName}</p>
+          </div>
+        </div>
+      )}
+
       <div style={styles.header}>
         <button style={styles.backBtn} onClick={() => { stopScanner(); navigate("/barista/dashboard"); }}>Back</button>
         <h1 style={styles.title}>Scan Customer QR</h1>
@@ -140,9 +159,23 @@ export default function QRScanner() {
           )}
         </div>
         {!scanning ? (
-          <button style={styles.scanBtn} onClick={startScanner}>Start Camera</button>
+          <button
+            style={styles.scanBtn}
+            onClick={startScanner}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.02)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+          >
+            Start Camera
+          </button>
         ) : (
-          <button style={styles.stopBtn} onClick={stopScanner}>Stop Camera</button>
+          <button
+            style={styles.stopBtn}
+            onClick={stopScanner}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.02)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+          >
+            Stop Camera
+          </button>
         )}
       </div>
 
@@ -160,7 +193,14 @@ export default function QRScanner() {
             value={manualCode}
             onChange={(e) => setManualCode(e.target.value)}
           />
-          <button style={styles.lookupBtn} type="submit">Look Up Customer</button>
+          <button
+            style={styles.lookupBtn}
+            type="submit"
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.02)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+          >
+            Look Up Customer
+          </button>
         </form>
       </div>
     </div>
@@ -174,6 +214,49 @@ const styles = {
     padding: "1rem",
     maxWidth: "480px",
     margin: "0 auto",
+    position: "relative",
+  },
+  successOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(62, 39, 35, 0.5)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 9999,
+    animation: "fadeIn 0.2s ease-in",
+  },
+  successModal: {
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    background: "var(--white)",
+    padding: "2rem 3rem",
+    borderRadius: "20px",
+    textAlign: "center",
+    boxShadow: "0 8px 40px rgba(62, 39, 35, 0.3)",
+    animation: "overlaySlideIn 0.3s ease-out",
+    zIndex: 10000,
+  },
+  successCheck: {
+    fontSize: "3rem",
+    display: "block",
+    marginBottom: "0.5rem",
+  },
+  successTitle: {
+    margin: 0,
+    fontSize: "1.2rem",
+    fontWeight: "700",
+    color: "var(--brown-dark)",
+  },
+  successName: {
+    margin: "0.3rem 0 0",
+    fontSize: "0.95rem",
+    color: "var(--brown-light)",
   },
   header: {
     display: "flex",
@@ -211,6 +294,7 @@ const styles = {
     marginBottom: "1rem",
     textAlign: "center",
     fontWeight: "600",
+    animation: "fadeIn 0.2s ease-in",
   },
   card: {
     background: "var(--cream-light)",
@@ -267,6 +351,7 @@ const styles = {
     fontSize: "1rem",
     fontWeight: "600",
     cursor: "pointer",
+    transition: "transform 0.2s ease",
   },
   stopBtn: {
     width: "100%",
@@ -278,6 +363,7 @@ const styles = {
     fontSize: "1rem",
     fontWeight: "600",
     cursor: "pointer",
+    transition: "transform 0.2s ease",
   },
   divider: {
     display: "flex",
@@ -318,5 +404,6 @@ const styles = {
     fontSize: "1rem",
     fontWeight: "600",
     cursor: "pointer",
+    transition: "transform 0.2s ease",
   },
 };

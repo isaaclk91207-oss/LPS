@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <style>
+      .doodle { fill: none; stroke: #3E2723; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0.14; }
+      .doodle-filled { fill: #3E2723; opacity: 0.12; }
+    </style>
+  </defs>
+
+  <!-- Coffee Cup 1 (top-left) -->
+  <g class="doodle" transform="translate(20, 20) scale(0.7)">
+    <path d="M4 12h20v16c0 3-3 5-5 5H9c-3 0-5-2-5-5V12z"/>
+    <path d="M24 16h4c3 0 5 2 5 5s-2 5-5 5h-4"/>
+    <path d="M10 4c0-2 3-2 3 0" fill="none"/>
+    <path d="M16 2c0-2 3-2 3 0" fill="none"/>
+  </g>
+
+  <!-- Coffee Bean 1 (top-right) -->
+  <g class="doodle" transform="translate(140, 18) scale(0.65)">
+    <ellipse cx="12" cy="12" rx="10" ry="13"/>
+    <path d="M6 6c4 6 4 14 0 20" fill="none"/>
+    <path d="M18 6c-4 6-4 14 0 20" fill="none"/>
+  </g>
+
+  <!-- Croissant (middle-left) -->
+  <g class="doodle" transform="translate(10, 100) scale(0.6)">
+    <path d="M4 18c2-8 8-14 16-14s12 4 14 8c-4 2-10 2-14-1s-10-3-16 7z"/>
+    <path d="M10 14c2-4 6-6 10-6" fill="none"/>
+    <path d="M8 18c3-4 8-5 12-3" fill="none"/>
+  </g>
+
+  <!-- Coffee Cup 2 (middle-right) -->
+  <g class="doodle" transform="translate(130, 95) scale(0.55)">
+    <path d="M4 12h20v16c0 3-3 5-5 5H9c-3 0-5-2-5-5V12z"/>
+    <path d="M24 16h4c3 0 5 2 5 5s-2 5-5 5h-4"/>
+    <circle cx="14" cy="22" r="2" class="doodle-filled"/>
+  </g>
+
+  <!-- Coffee Bean 2 (bottom-left) -->
+  <g class="doodle" transform="translate(30, 155) scale(0.55) rotate(-20)">
+    <ellipse cx="12" cy="12" rx="10" ry="13"/>
+    <path d="M6 6c4 6 4 14 0 20" fill="none"/>
+    <path d="M18 6c-4 6-4 14 0 20" fill="none"/>
+  </g>
+
+  <!-- Teapot (bottom-center) -->
+  <g class="doodle" transform="translate(85, 148) scale(0.5)">
+    <ellipse cx="18" cy="22" rx="16" ry="12"/>
+    <path d="M10 10h16c2 0 4 2 4 4H6c0-2 2-4 4-4z"/>
+    <path d="M2 20c-4 0-6-2-6-6s2-6 6-6" fill="none"/>
+    <path d="M34 16c4 0 8 2 8 6s-4 6-8 6" fill="none"/>
+    <path d="M16 8c0-4 2-6 2-8" fill="none"/>
+    <path d="M20 8c0-4 2-6 2-8" fill="none"/>
+  </g>
+
+  <!-- Coffee Bean 3 (bottom-right) -->
+  <g class="doodle" transform="translate(155, 160) scale(0.5) rotate(15)">
+    <ellipse cx="12" cy="12" rx="10" ry="13"/>
+    <path d="M6 6c4 6 4 14 0 20" fill="none"/>
+    <path d="M18 6c-4 6-4 14 0 20" fill="none"/>
+  </g>
+
+  <!-- Small steam wisps scattered -->
+  <path class="doodle" d="M65 30c0-4 4-4 4 0" fill="none"/>
+  <path class="doodle" d="M72 26c0-4 4-4 4 0" fill="none"/>
+  <path class="doodle" d="M115 130c0-3 3-3 3 0" fill="none"/>
+</svg>
